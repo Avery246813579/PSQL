@@ -21,8 +21,6 @@ class Table
 
     public function createTable()
     {
-        echo 'Test';
-
         $connection = new mysqli($this->hostname, $this->username, $this->password, $this->database) or die('Kittens');
 
         if ($connection->connect_errno > 0) {
@@ -43,11 +41,57 @@ class Table
             }
         }
 
-        $insert = 'CREATE TABLE IF NOT EXISTS ' . $this->table . ' (' . substr($table_content, 2, strlen($table_content)) . $table_suffix . ')';
-        $statement = $connection->prepare($insert);
-        echo $insert;
+        $statement = $connection->prepare('CREATE TABLE IF NOT EXISTS ' . $this->table . ' (' . substr($table_content, 2, strlen($table_content)) . $table_suffix . ')');
         $statement->execute();
+        $statement->close();
 
         $connection->close();
+    }
+
+    public function create($inputs)
+    {
+        $connection = new mysqli($this->hostname, $this->username, $this->password, $this->database) or die('Kittens');
+
+        if ($connection->connect_errno > 0) {
+            die('Unable to connect to database [' . $connection->connect_error . ']');
+        }
+
+        $table_keys = "";
+        $table_values = "";
+        $prepared_keys = "";
+        $prepared_values = array();
+        if (is_array($inputs)) {
+            foreach ($inputs as $key => $value) {
+                $table_keys = $table_keys . ', ' . $key;
+                $table_values = $table_values . ", ?";
+
+                array_push($prepared_values, $value);
+
+                if(is_numeric($value)){
+                    $prepared_keys = $prepared_keys . 'i';
+                }else{
+                    $prepared_keys = $prepared_keys . 's';
+                }
+            }
+        }
+
+        $statement = $connection->prepare('INSERT INTO ' . $this->table . ' (' . substr($table_keys, 2, strlen($table_keys)) . ') VALUES (' . substr($table_values, 2, strlen($table_values)) . ')');
+        call_user_func_array('mysqli_stmt_bind_param', array_merge (array($statement, $prepared_keys), $this->refValues($prepared_values)));
+        $statement->execute();
+        $statement->close();
+
+        $connection->close();
+    }
+
+    function refValues($arr)
+    {
+        if (strnatcmp(phpversion(), '5.3') >= 0) //Reference is required for PHP 5.3+
+        {
+            $refs = array();
+            foreach ($arr as $key => $value)
+                $refs[$key] = &$arr[$key];
+            return $refs;
+        }
+        return $arr;
     }
 }
