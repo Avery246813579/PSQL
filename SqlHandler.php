@@ -163,9 +163,7 @@ class Table
             }
         }
 
-        $insert = 'UPDATE ' . $this->table . ' SET ' . substr($table_values, 2, strlen($table_values)) . ' WHERE ' . substr($table_where_values, 4, strlen($table_where_values));
-        echo $insert;
-        $statement = $connection->prepare($insert);
+        $statement = $connection->prepare('UPDATE ' . $this->table . ' SET ' . substr($table_values, 2, strlen($table_values)) . ' WHERE ' . substr($table_where_values, 4, strlen($table_where_values)));
         call_user_func_array('mysqli_stmt_bind_param', array_merge(array($statement, $prepared_keys), $this->refValues($prepared_values)));
         $result = $statement->execute();
 
@@ -173,6 +171,41 @@ class Table
         $connection->close();
 
         return $result;
+    }
+
+    public function delete($where){
+        $connection = new mysqli($this->hostname, $this->username, $this->password, $this->database) or die('Kittens');
+
+        if ($connection->connect_errno > 0) {
+            die('Unable to connect to database [' . $connection->connect_error . ']');
+        }
+
+        $table_values = "";
+        $prepared_keys = "";
+        $prepared_values = array();
+        if (is_array($where)) {
+            foreach ($where as $key => $value) {
+                $table_values = $table_values . ' AND ' . $key . " = ?";
+
+                array_push($prepared_values, $value);
+
+                if (is_numeric($value)) {
+                    $prepared_keys = $prepared_keys . 'i';
+                } else {
+                    $prepared_keys = $prepared_keys . 's';
+                }
+            }
+        }
+
+        $statement = $connection->prepare('DELETE FROM ' . $this->table . ' WHERE ' . substr($table_values, 4, strlen($table_values)));
+        call_user_func_array('mysqli_stmt_bind_param', array_merge(array($statement, $prepared_keys), $this->refValues($prepared_values)));
+        $result = $statement->execute();
+
+        $statement->close();
+        $connection->close();
+
+        return $result;
+
     }
 
     function refValues($arr)
