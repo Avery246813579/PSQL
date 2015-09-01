@@ -96,7 +96,7 @@ class Table
         $prepared_values = array();
         if (is_array($where)) {
             foreach ($where as $key => $value) {
-                $table_values = $table_values . ', ' . $key . " = ?";
+                $table_values = $table_values . ' AND ' . $key . " = ?";
 
                 array_push($prepared_values, $value);
 
@@ -108,13 +108,15 @@ class Table
             }
         }
 
-        $statement = $connection->prepare('SELECT * FROM ' . $this->table . ' WHERE ' . substr($table_values, 2, strlen($table_values)));
+        $statement = $connection->prepare('SELECT * FROM ' . $this->table . ' WHERE ' . substr($table_values, 4, strlen($table_values)));
         call_user_func_array('mysqli_stmt_bind_param', array_merge(array($statement, $prepared_keys), $this->refValues($prepared_values)));
         $statement->execute();
 
-        $result = $statement->get_result();
+        $row = array();
+        $this->stmt_bind_assoc($statement, $row);
+
         $rows = array();
-        while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+        while ($statement->fetch()) {
             array_push($rows, $row);
         }
 
@@ -124,7 +126,25 @@ class Table
         return $rows;
     }
 
-    public function update($where, $values){
+    function stmt_bind_assoc(&$stmt, &$out)
+    {
+        $data = mysqli_stmt_result_metadata($stmt);
+        $fields = array();
+        $out = array();
+
+        $fields[0] = $stmt;
+        $count = 1;
+
+        while ($field = mysqli_fetch_field($data)) {
+            $fields[$count] = &$out[$field->name];
+            $count++;
+        }
+        call_user_func_array('mysqli_stmt_bind_result', $fields);
+    }
+
+
+    public function update($where, $values)
+    {
         $connection = new mysqli($this->hostname, $this->username, $this->password, $this->database) or die('Kittens');
 
         if ($connection->connect_errno > 0) {
@@ -173,7 +193,8 @@ class Table
         return $result;
     }
 
-    public function delete($where){
+    public function delete($where)
+    {
         $connection = new mysqli($this->hostname, $this->username, $this->password, $this->database) or die('Kittens');
 
         if ($connection->connect_errno > 0) {
