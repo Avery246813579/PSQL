@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * Created by PhpStorm.
+ * User: Avery
+ * Date: 2/5/2016
+ * Time: 10:00 AM
+ */
+class Account
+{
+    public $host, $username, $password;
+
+    public static function withHost($host, $username, $password){
+        $instance = new self();
+        $instance->host = $host;
+        $instance->username = $username;
+        $instance->password = $password;
+
+        return $instance;
+    }
+
+    public function toString(){
+        return $this->host . " " .  $this->username . " " . $this->password;
+    }
+}
