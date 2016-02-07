@@ -13,7 +13,7 @@ class Database extends Account
             $instance->username = $account->username;
             $instance->password = $account->password;
         } else {
-            //LOG
+            //TODO LOG
             die('ERROR');
         }
 
