@@ -40,6 +40,7 @@ class Table extends Database
     {
         $properties = "";
         $primary = array();
+        $foreign = array();
 
         if (is_array($this->properties)) {
             foreach ($this->properties as $value) {
@@ -48,6 +49,10 @@ class Table extends Database
 
                     if($value->index == Index::PRIMARY){
                         array_push($primary, $value->name);
+                    }
+
+                    if($value->isForeignSet()){
+                        array_push($foreign, $value);
                     }
                 }
             }
@@ -70,7 +75,20 @@ class Table extends Database
             $query .= substr($names, 2) . ')';
         }
 
+        if(count($foreign) > 0){
+            $delta = '';
+
+            foreach($foreign as $value){
+                if($value instanceof Property){
+                    $delta .= ', FOREIGN KEY (' . $value->name . ') REFERENCES ' . $value->getForeign_Table() . '(' . $value->getForeign_Key() . ')';
+                }
+            }
+
+            $query .= $delta;
+        }
+
         $query .= ')';
+
         $result = $connection->query($query);
         return $result;
     }

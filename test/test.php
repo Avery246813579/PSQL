@@ -15,7 +15,15 @@ $table->properties = [
     Property::withTL_AUTO_INDEX('ID', Type::INT, 10, Index::PRIMARY),
     Property::withTL('NAME',Type::VARCHAR, 25)
 ];
+
 echo 'CREATED: ' . $table->create() . '<BR>';
 echo 'ADDED: ' . $table->addRow(['ID' => 3, 'NAME' => 'Mexican']) . '<BR>';
 echo 'GET ROW: ' . $table->getRow(['ID' => 3])['NAME'];
 
+$table2 = Table::withDatabase($database, 'test4');
+$table2->drop();
+$table2->properties = [
+    Property::withTL_AUTO_INDEX('ID', Type::INT, 10, Index::PRIMARY)->addForeign('ID', 'test3')
+];
+
+$table2->create();

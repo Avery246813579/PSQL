@@ -3,6 +3,31 @@
 class Property
 {
     public $name, $type, $length = 0, $auto_incrementing = false, $not_null = false, $default, $index;
+    private $foreign_table, $foreign_key;
+
+    public function _clone(){
+        $instance = new self();
+
+        $instance->name = $this->name;
+        $instance->type = $this->type;
+        $instance->length = $this->length;
+        $instance->auto_incrementing = $this->auto_incrementing;
+        $instance->not_null = $this->not_null;
+        $instance->default = $this->default;
+        $instance->index = $this->index;
+        $instance->foreign_table = $this->foreign_table;
+        $instance->foreign_key = $this->foreign_key;
+
+        return $instance;
+    }
+
+    public function addForeign($foreign_key, $foreign_table){
+        $this->foreign_key = $foreign_key;
+        $this->foreign_table = $foreign_table;
+
+        return $this->_clone();
+    }
+
 
     //TODO Check if const has right types
     public static function withTL($name, $type, $length){
@@ -64,5 +89,17 @@ class Property
         }
 
         return $query;
+    }
+
+    public function isForeignSet(){
+        return isset($this->foreign_key);
+    }
+
+    public function getForeign_Table(){
+        return $this->foreign_table;
+    }
+
+    public function getForeign_Key(){
+        return $this->foreign_key;
     }
 }
