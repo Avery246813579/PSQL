@@ -28,6 +28,12 @@ class Property
         return $this->_clone();
     }
 
+    public function notNull(){
+        $this->not_null = true;
+
+        return $this->_clone();
+    }
+
 
     //TODO Check if const has right types
     public static function withTL($name, $type, $length){

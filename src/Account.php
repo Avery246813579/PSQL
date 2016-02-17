@@ -8,7 +8,7 @@
  */
 class Account
 {
-    public $host, $username, $password;
+    public $host, $port, $username, $password;
 
     public static function withHost($host, $username, $password){
         $instance = new self();
@@ -19,7 +19,17 @@ class Account
         return $instance;
     }
 
+    public static function withPort($host, $port, $username, $password){
+        $instance = new self();
+        $instance->host = $host;
+        $instance->port = $port;
+        $instance->username = $username;
+        $instance->password = $password;
+
+        return $instance;
+    }
+
     public function toString(){
-        return $this->host . " " .  $this->username . " " . $this->password;
+        return $this->host . " " . $this->port . " " .  $this->username . " " . $this->password;
     }
 }

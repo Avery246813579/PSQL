@@ -12,6 +12,7 @@ class Database extends Account
             $instance->host = $account->host;
             $instance->username = $account->username;
             $instance->password = $account->password;
+            $instance->port = $account->port;
         } else {
             //TODO LOG
             die('ERROR');
@@ -28,10 +29,14 @@ class Database extends Account
 
     public function createConnection()
     {
-        $connection = new mysqli($this->host, $this->username, $this->password, $this->database);
+        if(isset($this->port)) {
+            $connection = new mysqli($this->host, $this->username, $this->password, $this->database, $this->port);
+        }else{
+            $connection = new mysqli($this->host, $this->username, $this->password, $this->database);
+        }
 
         if ($connection->connect_errno > 0) {
-            die('ERROR');
+            die('DATABASE CONNECTION ERROR');
         }
 
         return $connection;

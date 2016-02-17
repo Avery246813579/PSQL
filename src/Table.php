@@ -21,6 +21,7 @@ class Table extends Database
             $instance->username = $database->username;
             $instance->password = $database->password;
             $instance->host = $database->host;
+            $instance->port = $database->port;
             $instance->database = $database->database;
         } else {
             //TODO LOG
