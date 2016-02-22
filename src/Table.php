@@ -132,6 +132,10 @@ class Table extends Database
         return $this->getRowsWith($where, Filter::_AND)[0];
     }
 
+    public function getRowWith($where, $filter){
+        return $this->getRowsWith($where, Filter::_AND)[0];
+    }
+
     public function getRows($where)
     {
         return $this->getRowsWith($where, Filter::_AND);

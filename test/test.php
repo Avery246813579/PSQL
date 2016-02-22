@@ -11,6 +11,7 @@ $account = Account::withHost('127.0.0.1', 'root', '');
 $database = Database::withAccount($account, 'test');
 $table = Table::withDatabase($database, 'test3');
 echo 'DROPPED: ' . $table->drop() . "<BR>";
+
 $table->properties = [
     Property::withTL_AUTO_INDEX('ID', Type::INT, 10, Index::PRIMARY),
     Property::withTL('NAME',Type::VARCHAR, 25)
